@@ -13,15 +13,15 @@ $('#enter').tap(function(){
   $.post('/api/skill',{},function(response){
     var html = '';
     for(var i=0;i<response.length;i++){
-      html+='<li>'+response[i].category+'</li>'
+      html+='<li>'+response[i].name+'</li>'
     }
     $('#scroller ul').html(html);
-
-    var myScroll = new IScroll('#wrapper', {mouseWheel:true});
-    document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);  
+    
+   
     
   })
-
+    var myScroll = new IScroll('#wrapper', {mouseWheel:true});
+    document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);  
  
 })
 
@@ -42,14 +42,18 @@ var mySwiper = new Swiper ('.swiper-container', {
   } 
 }) 
 
+$('#footer div').eq(0).css({'background':'#e9e9e9','color':'#31B020'});
+
 $('#footer div').tap(function(){
   var apiT = $(this).attr('id');
+  $('#footer div').css({'background':'#444','color':'#fff'})
+  $(this).css({'background':'#e9e9e9','color':'#31B020'})
 
   //数据请求,然后请求api、skill，显示在浏览器上iScoll
   $.post('/api/'+apiT,{},function(response){
     var html = '';
     for(var i=0;i<response.length;i++){
-      html+='<li>'+response[i].category+'</li>'
+      html+='<li>'+response[i].name+'</li>'
     }
     $('#scroller ul').html(html);
 
@@ -57,7 +61,7 @@ $('#footer div').tap(function(){
   })
 
 })
-
+//loading加载
 var interval = setInterval(function(){
   if(document.readyState === 'complete'){
     clearInterval(interval);
@@ -70,6 +74,7 @@ var interval = setInterval(function(){
   }
 },100);
 
+//圆环js效果
   var k=0 
    $('canvas.process').each(function() {  
     
@@ -219,3 +224,23 @@ var interval = setInterval(function(){
 //  
 //drawProcess()   
 //    
+//第二个页面动画效果
+    var x=0;
+    var y=0;
+    $('.fly').append($('<p>'))
+    for(i=0;i<40;i++){
+      x+=0.05
+      $('.fly').append($('<p>'))
+      $('.fly p').eq(i).css('animation','mMove 5s '+x+'s linear infinite')
+      $('.fly p').eq(i).css('left',y+=10)
+    }
+        
+   $('#scroller ul').on('tap','li',function(){
+
+      $('#scroller li').css('backgroundColor','#fafafa');
+      $(this).css('backgroundColor','#e9e9e9');
+   })     
+        
+          
+      
+          

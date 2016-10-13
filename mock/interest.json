@@ -1,0 +1,21 @@
+[
+	{
+		"category":"规范",
+		"name":"篮球",
+		"time":"1年",
+		"level":"了解"
+	},
+	{
+		"category":"框架",
+		"name":"乒乓球",
+		"time":"乒乓球",
+		"level":"熟悉"
+	},
+	{
+		"category":"框架",
+		"name":"游泳",
+		"time":"2年",
+		"level":"熟悉"
+	}
+
+]
