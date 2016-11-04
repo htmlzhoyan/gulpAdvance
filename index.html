@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>宝宝app</title>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <style type="text/css">
+    body {
+        min-height: 2000px;
+        padding-top: 70px;
+    }
+
+    </style>
+</head>
+
+<body ng-app='foodModule'>
+    <ui-view></ui-view>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src='js/jquery-1.12.4.js'></script>
+     <script type="text/javascript">
+      $('.navbar-right>li').on('click',function(){
+         $('.navbar-right>li').removeClass('active')
+        $(this).addClass('active')
+      })
+    </script>
+    <script type="text/javascript">
+    (function() {
+        'use strict';
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+            var msViewportStyle = document.createElement('style')
+            msViewportStyle.appendChild(
+                document.createTextNode(
+                    '@-ms-viewport{width:auto!important}'
+                )
+            )
+            document.querySelector('head').appendChild(msViewportStyle)
+        }
+    })();
+    </script>
+    <script type="text/javascript" src='js/angular.js'></script>
+    <script type="text/javascript" src='js/angular-ui-router.min.js'></script>
+    <script type="text/javascript">
+    var foodApp = angular.module('foodModule', ['ui.router'])
+        .run(function($rootScope) {
+            $rootScope.foodPrefix = 'http://tnfs.tngou.net/image'
+        })
+        .config(function($stateProvider, $urlMatcherFactoryProvider, $locationProvider, $urlRouterProvider) {
+            $urlMatcherFactoryProvider.caseInsensitive(true);
+            $urlRouterProvider.otherwise('/navbar/home');
+            $stateProvider
+                .state('navbar', {
+                    url: '/navbar',
+                    templateUrl: 'template/navbar.html',
+                    controller: 'navbarController'
+                })
+
+            .state('navbar.home', {
+                    url: '/home',
+                    templateUrl: 'template/home.html',
+                    controller: 'homeController'
+                })
+                .state('navbar.foodList', {
+                    url: '/foodList/:id/:page',
+                    templateUrl: 'template/foodList.html',
+                    controller: 'foodListController'
+                })
+
+            .state('navbar.foodDetail', {
+                url: '/foodDetail/:id',
+                templateUrl: 'template/foodDetail.html',
+                controller: 'foodDetailController'
+            })
+
+            .state('navbar.city', {
+                url: '/city',
+                templateUrl: 'template/city.html',
+                controller: 'cityController'
+            })
+            .state('navbar.healthList',{
+              url:'/healthList/:id/:page',
+              templateUrl: 'template/healthList.html',
+              controller: 'heathListController'
+
+            })
+            .state('navbar.healthDetail',{
+                url:'/healthDetail/:id',
+                templateUrl:'template/healthDetail.html',
+                controller:'healthDetailController'
+            })
+            .state('navbar.news',{
+                url:'/news/:page',
+                templateUrl:'template/news.html',
+                controller:'newsController'
+            })
+
+        })
+        .controller('navbarController', function($scope, $http) {
+
+            $http({
+                url: 'http://localhost/index.php',
+                method: 'get',
+
+            }).then(function(response) {
+                 
+                $scope.foodCategory = response.data.tngou;
+            })
+
+            $http({
+             url: 'http://localhost/food_index.php',
+             method:'get',
+             }).then(function(response){
+              // console.log(response.data.tngou)
+              $scope.healthCategory = response.data.tngou;
+             })
+
+
+
+
+        })
+        .controller('homeController', function($scope) {
+            $scope.navbarMsg = 'navbar';
+        })
+       
+    
+          
+       
+
+    .controller('cityController', function($scope, $http, $stateParams) {
+
+        $scope.city = '';
+        
+        $scope.send = function() {
+          var params = {
+            c: $scope.city
+        }
+            $http({
+                url: 'http://localhost/city.php',
+                method: 'get',
+                params: params
+            }).then(function(response) {
+                if(response.data.status==0){
+                    $scope.cityCategoryx =''
+                     $scope.cityCategoryy =''
+                    if($scope.city==''){
+                      $scope.warn='请输入城市名'
+                    }else{
+                      $scope.warn='请输入正确的城市名'
+                    }
+                                 
+                }else{
+                $scope.warn=''
+                  $scope.cityCategoryx = "x坐标为:" + response.data.x;
+                  $scope.cityCategoryy = "y坐标为:" + response.data.y;
+                }
+            
+                
+            })
+        }
+    })
+    .controller('newsController',function($scope,$http,$stateParams){
+        var num = 21;
+        var params={
+            page: $stateParams.page,
+            num:num
+        }
+        $http({
+            url:'http://localhost/news.php',
+            method:'get',
+            params:params
+        }).then(function(response){
+          
+            
+            // $scope.newsPageCount = Math.ceil(response.data.total / num);
+            //  var pageCountList = [];
+            //     for (var i = 1; i < Math.ceil(response.data.total / num); i++) {
+            //         pageCountList.push(i);
+            //     }
+            // $scope.newsPageCount = pageCountList;
+             // console.log(response)
+                //返回菜品列表的数据
+                 $scope.newsListsCategory=response.data.newslist
+                //设置分类的id
+                 // $scope.newsCateId = $stateParams.page;
+                //确定分页数，但是foodListPagecount是一个数值，他不是一个对象，所以我么的需要将页面转化成对
+                $scope.newsListsPageCount = Math.ceil(response.data.code / num);
+                //如果想要把上面三行代码进行优化，可以进行对象的封装
+                //  var foodLists=
+                // })
+                  console.log(response.data.newslist)
+                var pageCountList = [];
+                for (var i = 1; i < Math.ceil(response.data.code / num); i++) {
+                    pageCountList.push(i);
+                }
+                $scope.newsListsPageCount = pageCountList;
+
+
+        })
+    })
+    
+
+    .controller('foodListController', function($scope, $http, $stateParams) {
+            var rows = 30;
+            var params = {
+                id: $stateParams.id,
+                page: $stateParams.page,
+                rows: rows
+
+            }
+            $http({
+                url: 'http://localhost/list.php',
+                method: 'get',
+                params: params
+            }).then(function(response) {
+                // console.log(response)
+                //返回菜品列表的数据
+                $scope.foodLists = response.data.tngou;
+                //设置分类的id
+                $scope.foodCateId = $stateParams.id;
+                //确定分页数，但是foodListPagecount是一个数值，他不是一个对象，所以我么的需要将页面转化成对
+                $scope.foodListsPageCount = Math.ceil(response.data.total / rows);
+                //如果想要把上面三行代码进行优化，可以进行对象的封装
+                //  var foodLists=
+                // })
+                var pageCountList = [];
+                for (var i = 1; i < Math.ceil(response.data.total / rows); i++) {
+                    pageCountList.push(i);
+                }
+                $scope.foodListsPageCount = pageCountList;
+
+            })
+        })
+
+         //healthlist菜单列表
+       .controller('heathListController',function($scope,$http,$stateParams){
+            var rows = 9;
+            var params = {
+              id:$stateParams.id,
+              page:$stateParams.page,
+              rows:rows
+            } 
+             $http({
+              url:'http://localhost/healthList.php',
+              method:'get',
+              params:params
+             }).then(function(response){
+                $scope.healthList=response.data.tngou;
+                $scope.healthCateId=$stateParams.id;
+                $scope.healthListsPageCount=Math.ceil(response.data.total/rows);
+                var pageCountList=[];
+                for(var i=1;i<Math.ceil(response.data.total/rows);i++){
+                  pageCountList.push(i);
+                }
+                $scope.healthListsPageCount = pageCountList
+             })
+       })
+        .controller('foodDetailController', function($scope, $http, $stateParams, $sce) {
+
+            $http({
+                url: 'http://localhost/detail.php',
+                method: 'get',
+                params: {
+                    id: $stateParams.id
+                }
+
+            }).then(function(res) {
+
+                $scope.detail = res.data;
+                $scope.html = $sce.trustAsHtml($scope.detail.message)
+
+
+            })
+        })
+        .controller('healthDetailController',function($scope,$http,$stateParams,$sce){
+            $http({
+                url:'http://localhost/healthDetail.php',
+                method:'get',
+                params:{
+                    id: $stateParams.id
+                }
+            }).then(function(res){
+                 $scope.detail = res.data;
+                $scope.html = $sce.trustAsHtml($scope.detail.message)
+                console.log(res.data)
+            })
+        })
+    </script>
+</body>
+
+</html>
